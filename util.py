@@ -27,3 +27,13 @@ def to_uppercase(input_string):
     if not isinstance(input_string, str):
         raise ValueError("str only")
     return input_string.upper()
+
+def get_batch(urls, batch_number, batch_size=16):
+    start_idx = (batch_number - 1) * batch_size
+    end_idx = start_idx + batch_size
+
+    batch_urls = urls[start_idx:end_idx]
+    batch_len = len(batch_urls)
+    batch_start_idx = start_idx + 1
+
+    return batch_len, batch_start_idx, batch_urls
