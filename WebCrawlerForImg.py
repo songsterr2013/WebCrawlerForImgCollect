@@ -16,8 +16,14 @@ class WebCrawlerForImg:
         self.cookies_file = cookies_file
 
         self.main_dir_name = "Downloaded_images"
-
-        self.session = cloudscraper.create_scraper()
+        self.session = cloudscraper.create_scraper(
+            browser={
+                'browser': 'firefox',
+                'platform': 'windows',
+                'mobile': False
+            },
+            delay=10
+        )
 
     def login(self):
         """
@@ -36,12 +42,12 @@ class WebCrawlerForImg:
         time_stoper(2)
 
         # 進入登入頁面，而不是直接POST，模擬真實使用者的動者
-        response = self.session.get(self.login_url, headers=self.headers)
+        response = self.session.get(self.login_url)#, headers=self.headers)
         print(f'進入登入頁面中...請求狀態:{response.status_code}')
         time_stoper(2)
 
         # 執行登入動作並獲取cookies
-        post_response = self.session.post(self.login_url, data=payload, headers=self.headers)
+        post_response = self.session.post(self.login_url, data=payload)#, headers=self.headers)
         if post_response.status_code == 200:
             soup = BeautifulSoup(post_response.text, 'html.parser')
             print(soup)
@@ -73,7 +79,6 @@ class WebCrawlerForImg:
 
             # 1.基於list中的url進入指定的網址並取得所有圖片的url
             to_download = self.get_all_images(url)
-            break
 
             # 2.建立最外圍folder
             make_folder(self.main_dir_name)
@@ -95,7 +100,7 @@ class WebCrawlerForImg:
         """
         基於對html的parse，提取所有目標img的url，最後return出一個list
         """
-        response = self.session.get(url, headers=self.headers)
+        response = self.session.get(url)#, headers=self.headers)
         print(f'進入目標頁面{url}中...請求狀態:{response.status_code}, 遞迴次數: {count + 1}' )
 
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -138,7 +143,7 @@ class WebCrawlerForImg:
             try:
                 # 獲取圖片內容
                 print(f"正在下載圖片: {img_url}")
-                response = self.session.get(img_url, headers=self.headers, stream=True)  # 使用 stream 提升大文件處理效率
+                response = self.session.get(img_url, stream=True)#, headers=self.headers)  # 使用 stream 提升大文件處理效率
                 print('圖片連結請求成功!:', response.status_code)  # 確保請求成功
 
                 # 保存圖片文件名
